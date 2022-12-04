@@ -1,5 +1,5 @@
 # Social app backend
---- DESCRIPTIONS ---
+## --- DESCRIPTIONS ---
 - Backend of social app using nodejs express, mongoDB
---- ABOUT SOCIAL APP ---
+## --- ABOUT SOCIAL APP ---
 - ( add when done app )
