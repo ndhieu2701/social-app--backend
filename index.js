@@ -7,8 +7,7 @@ import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
-import upload from "./middleware/upload.js"
-import register from "./controllers/auth.js"
+
 //import routes
 import authRoutes from "./routes/auth.js"
 
@@ -28,8 +27,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
-// routes with file
-app.post("/auth/register", upload.single("picture"), register)
+
 
 //routes
 app.use("/auth", authRoutes)
