@@ -9,7 +9,8 @@ import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 
 //import routes
-import authRoutes from "./routes/auth.js"
+import authRoutes from "./routes/auth.js";
+import usersRoutes from "./routes/users.js";
 
 // configurations
 
@@ -27,10 +28,9 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
-
-
 //routes
-app.use("/auth", authRoutes)
+app.use("/auth", authRoutes);
+app.use("/users", usersRoutes);
 
 // connect db & run server
 const PORT = process.env.PORT || 6001;
