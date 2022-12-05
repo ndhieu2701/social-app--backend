@@ -8,12 +8,17 @@ import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 
-//import routes
+// import data test
+// import User from "./models/User.js";
+// import Post from "./models/Post.js";
+// import { users, posts } from "./data/index.js";
+
+// import routes
 import authRoutes from "./routes/auth.js";
 import usersRoutes from "./routes/users.js";
+import postsRoutes from "./routes/posts.js";
 
 // configurations
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
@@ -31,11 +36,15 @@ app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 //routes
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
+app.use("/posts", postsRoutes);
 
 // connect db & run server
 const PORT = process.env.PORT || 6001;
 connectDB()
   .then(() => {
     app.listen(PORT, () => console.log("app listening on port: ", PORT));
+    // add data one time
+    // User.insertMany(users)
+    // Post.insertMany(posts)
   })
   .catch((err) => console.log(`${err} did not connect`));
