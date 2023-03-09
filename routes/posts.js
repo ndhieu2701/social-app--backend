@@ -1,6 +1,5 @@
 import express from "express";
 import { verifyToken } from "../middleware/auth.js";
-import upload from "../middleware/upload.js";
 import {
   createPost,
   getFeedPosts,
@@ -19,6 +18,6 @@ router.patch("/:id/like", verifyToken, likePost);
 
 /* CREATE */
 // posts with file
-router.post("/", verifyToken, upload.single("picture"), createPost);
+router.post("/", verifyToken, createPost);
 
 export default router;

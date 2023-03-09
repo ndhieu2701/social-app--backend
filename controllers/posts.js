@@ -4,6 +4,7 @@ import User from "../models/User.js";
 /* CREATE */
 // [POST] /posts : create post
 const createPost = async (req, res) => {
+  console.log(req.body);
   try {
     const { userId, description, picturePath } = req.body;
     const user = await User.findById(userId);
@@ -19,7 +20,7 @@ const createPost = async (req, res) => {
       comments: [],
     });
     // find all the post after create new post
-    const posts = await Post.find();
+    const posts = await Post.find().sort({ createdAt: -1 });
     res.status(201).json(posts);
   } catch (err) {
     res.status(409).json({ message: err.message });
@@ -30,7 +31,7 @@ const createPost = async (req, res) => {
 // [GET] /posts : get feed posts
 const getFeedPosts = async (req, res) => {
   try {
-    const posts = await Post.find();
+    const posts = await Post.find().sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -42,7 +43,8 @@ const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
     //find post by userId
-    const posts = await Post.find({ userId });
+    const posts = await Post.find({ userId }).sort({ createdAt: -1 });
+    // const postsReverse = posts.reverse();
     res.status(200).json(posts);
   } catch (err) {
     res.status(404).json({ message: err.message });

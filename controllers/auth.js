@@ -6,14 +6,14 @@ import User from "../models/User.js";
 export const register = async (req, res) => {
   try {
     const {
-      firstName,
-      lastName,
       email,
       password,
-      picturePath,
-      friends,
+      firstName,
+      lastName,
       location,
       occupation,
+      picturePath,
+      friends,
     } = req.body;
 
     // hash password
