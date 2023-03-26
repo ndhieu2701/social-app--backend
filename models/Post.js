@@ -18,6 +18,10 @@ const PostSchema = new Schema(
     location: String,
     description: String,
     picturePath: String,
+    filePath: String,
+    fileName: String,
+    audioPath: String,
+    audioName: String,
     userPicturePath: String,
     likes: {
       type: Map,

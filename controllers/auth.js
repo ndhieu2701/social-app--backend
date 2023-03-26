@@ -37,7 +37,11 @@ export const register = async (req, res) => {
     //response to client
     res.status(201).json(user);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (err.code === 11000) {
+      res.status(400).json("Email exist!");
+    } else {
+      res.status(500).json(err.message);
+    }
   }
 };
 
@@ -49,16 +53,16 @@ export const login = async (req, res) => {
 
     /* VALIDATE LOGIN */
     //check user exist or not
-    if (!user) return res.status(400).json({ msg: "User does not exist!" });
+    if (!user) return res.status(400).json("User does not exist!");
 
     // check password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Invalid password" });
+    if (!isMatch) return res.status(400).json("Invalid password!");
 
     //delete password in user and response to client
     delete user.password;
     res.status(200).json({ token: generateToken(user._id), user });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json(err.message);
   }
 };

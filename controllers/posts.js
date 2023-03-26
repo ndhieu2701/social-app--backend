@@ -5,7 +5,15 @@ import User from "../models/User.js";
 // [POST] /posts : create post
 const createPost = async (req, res) => {
   try {
-    const { userId, description, picturePath } = req.body;
+    const {
+      userId,
+      description,
+      picturePath,
+      filePath,
+      fileName,
+      audioPath,
+      audioName,
+    } = req.body;
     const user = await User.findById(userId);
     const newPost = await Post.create({
       userId,
@@ -15,6 +23,10 @@ const createPost = async (req, res) => {
       description,
       userPicturePath: user.picturePath,
       picturePath,
+      fileName,
+      filePath,
+      audioPath,
+      audioName,
       likes: {},
       comments: [],
     });
@@ -22,7 +34,7 @@ const createPost = async (req, res) => {
     const posts = await Post.find().sort({ createdAt: -1 });
     res.status(201).json(posts);
   } catch (err) {
-    res.status(409).json({ message: err.message });
+    res.status(409).json(err.message);
   }
 };
 
@@ -33,7 +45,7 @@ const getFeedPosts = async (req, res) => {
     const posts = await Post.find().sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    res.status(404).json(err.message);
   }
 };
 
@@ -46,7 +58,7 @@ const getUserPosts = async (req, res) => {
     // const postsReverse = posts.reverse();
     res.status(200).json(posts);
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    res.status(404).json(err.message);
   }
 };
 
@@ -76,7 +88,7 @@ const likePost = async (req, res) => {
     );
     res.status(200).json(updatedPost);
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    res.status(404).json(err.message);
   }
 };
 
