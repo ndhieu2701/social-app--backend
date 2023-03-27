@@ -11,8 +11,6 @@ const createPost = async (req, res) => {
       picturePath,
       filePath,
       fileName,
-      audioPath,
-      audioName,
     } = req.body;
     const user = await User.findById(userId);
     const newPost = await Post.create({
@@ -25,8 +23,6 @@ const createPost = async (req, res) => {
       picturePath,
       fileName,
       filePath,
-      audioPath,
-      audioName,
       likes: {},
       comments: [],
     });
