@@ -5,13 +5,7 @@ import User from "../models/User.js";
 // [POST] /posts : create post
 const createPost = async (req, res) => {
   try {
-    const {
-      userId,
-      description,
-      picturePath,
-      filePath,
-      fileName,
-    } = req.body;
+    const { userId, description, picturePath, filePath, fileName } = req.body;
     const user = await User.findById(userId);
     const newPost = await Post.create({
       userId,
@@ -87,5 +81,41 @@ const likePost = async (req, res) => {
     res.status(404).json(err.message);
   }
 };
+//[PUT] /posts/:id/update : update post
+const updatePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { description, fileName, filePath, picturePath } = req.body;
+    const post = await Post.findById(id);
 
-export { createPost, getFeedPosts, getUserPosts, likePost };
+    post.description = description;
+    post.fileName = fileName;
+    post.filePath = filePath;
+    post.picturePath = picturePath;
+
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      {
+        description: post.description,
+        fileName: post.fileName,
+        filePath: post.filePath,
+        picturePath: post.picturePath,
+      },
+      { new: true }
+    );
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    res.status(404).json(error.message);
+  }
+};
+//[DELETE] /posts/:id/delete : delete post
+const deletePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedPost = await Post.deleteOne({ _id: id });
+    res.status(200).json("Delete success");
+  } catch (error) {
+    res.status(404).json(error.message);
+  }
+};
+export { createPost, getFeedPosts, getUserPosts, likePost, updatePost , deletePost};
