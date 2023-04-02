@@ -5,7 +5,8 @@ import User from "../models/User.js";
 // [POST] /posts : create post
 const createPost = async (req, res) => {
   try {
-    const { userId, description, picturePath, filePath, fileName } = req.body;
+    const { userId, description, picturePath, filePath, fileName, profileId } =
+      req.body;
     const user = await User.findById(userId);
     const newPost = await Post.create({
       userId,
@@ -20,9 +21,16 @@ const createPost = async (req, res) => {
       likes: {},
       comments: [],
     });
-    // find all the post after create new post
-    const posts = await Post.find().sort({ createdAt: -1 });
-    res.status(201).json(posts);
+    if (profileId) {
+      const posts = await Post.find({ userId: profileId }).sort({
+        createdAt: -1,
+      });
+      res.status(201).json(posts);
+    } else {
+      // find all the post after create new post
+      const posts = await Post.find().sort({ createdAt: -1 });
+      res.status(201).json(posts);
+    }
   } catch (err) {
     res.status(409).json(err.message);
   }
@@ -118,4 +126,11 @@ const deletePost = async (req, res) => {
     res.status(404).json(error.message);
   }
 };
-export { createPost, getFeedPosts, getUserPosts, likePost, updatePost , deletePost};
+export {
+  createPost,
+  getFeedPosts,
+  getUserPosts,
+  likePost,
+  updatePost,
+  deletePost,
+};
