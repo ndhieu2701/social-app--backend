@@ -30,8 +30,6 @@ export const register = async (req, res) => {
       friends,
       location,
       occupation,
-      viewedProfile: 0,
-      impressions: 0,
     });
 
     //response to client

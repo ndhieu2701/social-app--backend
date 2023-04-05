@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import bcrypt from "bcrypt";
 
 /* READ */
 // [GET] /users/:id : get user
@@ -70,4 +71,39 @@ const addRemoveFriend = async (req, res) => {
   }
 };
 
-export { getUser, getUserFriends, addRemoveFriend };
+//[PUT]/users/:id/update: update user
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firstName, lastName, location, occupation, picturePath, password } =
+      req.body;
+    const user = await User.findById(id);
+
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.location = location;
+    user.occupation = occupation;
+    if (picturePath) user.picturePath = picturePath;
+    if (password) {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (isMatch) return res.status(404).json("password cann't be old password");
+
+      const salt = await bcrypt.genSalt();
+      const passwordHash = await bcrypt.hash(password, salt);
+      user.password = passwordHash;
+    }
+    const updatedUser = await User.findByIdAndUpdate(id, {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      location: user.location,
+      occupation: user.occupation,
+      password: user.password,
+      picturePath: user.picturePath,
+    });
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(404).json(error.message);
+  }
+};
+
+export { getUser, getUserFriends, addRemoveFriend, updateUser };
