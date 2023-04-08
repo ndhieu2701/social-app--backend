@@ -9,12 +9,8 @@ const createPost = async (req, res) => {
       req.body;
     const user = await User.findById(userId);
     const newPost = await Post.create({
-      userId,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      location: user.location,
+      user: user._id,
       description,
-      userPicturePath: user.picturePath,
       picturePath,
       fileName,
       filePath,
@@ -22,13 +18,15 @@ const createPost = async (req, res) => {
       comments: [],
     });
     if (profileId) {
-      const posts = await Post.find({ userId: profileId }).sort({
-        createdAt: -1,
-      });
+      const posts = await Post.find({ user: profileId })
+        .sort({
+          createdAt: -1,
+        })
+        .populate("user");
       res.status(201).json(posts);
     } else {
       // find all the post after create new post
-      const posts = await Post.find().sort({ createdAt: -1 });
+      const posts = await Post.find().sort({ createdAt: -1 }).populate("user");
       res.status(201).json(posts);
     }
   } catch (err) {
@@ -40,7 +38,7 @@ const createPost = async (req, res) => {
 // [GET] /posts : get feed posts
 const getFeedPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 });
+    const posts = await Post.find().sort({ createdAt: -1 }).populate("user");
     res.status(200).json(posts);
   } catch (err) {
     res.status(404).json(err.message);
@@ -52,7 +50,9 @@ const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
     //find post by userId
-    const posts = await Post.find({ userId }).sort({ createdAt: -1 });
+    const posts = await Post.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .populate("user");
     // const postsReverse = posts.reverse();
     res.status(200).json(posts);
   } catch (err) {
@@ -83,7 +83,7 @@ const likePost = async (req, res) => {
       { likes: post.likes },
       // return ban moi thay vi ban goc
       { new: true }
-    );
+    ).populate("user");
     res.status(200).json(updatedPost);
   } catch (err) {
     res.status(404).json(err.message);
@@ -110,7 +110,7 @@ const updatePost = async (req, res) => {
         picturePath: post.picturePath,
       },
       { new: true }
-    );
+    ).populate("user");
     res.status(200).json(updatedPost);
   } catch (error) {
     res.status(404).json(error.message);

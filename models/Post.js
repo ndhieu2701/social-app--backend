@@ -3,24 +3,14 @@ const Schema = mongoose.Schema;
 
 const PostSchema = new Schema(
   {
-    userId: {
-      type: String,
-      required: true,
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User"
     },
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    location: String,
     description: String,
     picturePath: String,
     filePath: String,
     fileName: String,
-    userPicturePath: String,
     likes: {
       type: Map,
       of: Boolean,
