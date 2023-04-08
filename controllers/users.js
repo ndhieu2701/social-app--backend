@@ -77,29 +77,31 @@ const updateUser = async (req, res) => {
     const { id } = req.params;
     const { firstName, lastName, location, occupation, picturePath, password } =
       req.body;
+
     const user = await User.findById(id);
 
-    user.firstName = firstName;
-    user.lastName = lastName;
-    user.location = location;
-    user.occupation = occupation;
-    if (picturePath) user.picturePath = picturePath;
     if (password) {
       const isMatch = await bcrypt.compare(password, user.password);
-      if (isMatch) return res.status(404).json("password cann't be old password");
+      if (isMatch)
+        return res.status(404).json("password cann't be old password");
 
       const salt = await bcrypt.genSalt();
       const passwordHash = await bcrypt.hash(password, salt);
-      user.password = passwordHash;
+      password = passwordHash;
     }
-    const updatedUser = await User.findByIdAndUpdate(id, {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      location: user.location,
-      occupation: user.occupation,
-      password: user.password,
-      picturePath: user.picturePath,
-    });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        firstName,
+        lastName,
+        location,
+        occupation,
+        password: password ? password : user.password,
+        picturePath: picturePath || user.picturePath,
+      },
+      { new: true }
+    );
     res.status(200).json(updatedUser);
   } catch (error) {
     res.status(404).json(error.message);
