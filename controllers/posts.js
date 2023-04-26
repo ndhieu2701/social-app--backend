@@ -1,5 +1,6 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import mongoose from "mongoose";
 
 /* CREATE */
 // [POST] /posts : create post
@@ -15,7 +16,6 @@ const createPost = async (req, res) => {
       fileName,
       filePath,
       likes: {},
-      comments: [],
     });
     if (profileId) {
       const posts = await Post.find({ user: profileId })
@@ -38,7 +38,41 @@ const createPost = async (req, res) => {
 // [GET] /posts : get feed posts
 const getFeedPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 }).populate("user");
+    // const posts = await Post.find().sort({ createdAt: -1 }).populate("user");
+    const posts = await Post.aggregate([
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "comments",
+        },
+      },
+      {
+        $lookup: {
+          from: "users", // collection to lookup
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 1,
+          user: "$user",
+          description: 1,
+          picturePath: 1,
+          filePath: 1,
+          fileName: 1,
+          likes: 1,
+          commentCount: { $size: "$comments" },
+          createdAt: 1
+        },
+      },
+    ]);
     res.status(200).json(posts);
   } catch (err) {
     res.status(404).json(err.message);
@@ -50,9 +84,45 @@ const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
     //find post by userId
-    const posts = await Post.find({ user: userId })
-      .sort({ createdAt: -1 })
-      .populate("user");
+    const posts = await Post.aggregate([
+      {
+        $match: {
+          user: mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "comments",
+        },
+      },
+      {
+        $lookup: {
+          from: "users", // collection to lookup
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 1,
+          user: "$user",
+          description: 1,
+          picturePath: 1,
+          filePath: 1,
+          fileName: 1,
+          likes: 1,
+          commentCount: { $size: "$comments" },
+          createdAt: 1
+        },
+      },
+    ]);
     // const postsReverse = posts.reverse();
     res.status(200).json(posts);
   } catch (err) {

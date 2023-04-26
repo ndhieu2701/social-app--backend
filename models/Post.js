@@ -15,10 +15,6 @@ const PostSchema = new Schema(
       type: Map,
       of: Boolean,
     },
-    comments: {
-      type: Array,
-      default: [],
-    },
   },
   { timestamps: true }
 );
