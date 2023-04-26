@@ -34,6 +34,20 @@ const getUserFriends = async (req, res) => {
   }
 };
 
+//[GET]/users?q=any : search user with query
+const searchUser = async (req, res) => {
+  try {
+    const { q } = req.query;
+    const regex = new RegExp(q, "i");
+    const users = await User.find({
+      $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }],
+    }).select("_id firstName lastName picturePath");
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(404).json(error.message);
+  }
+};
+
 /* UPDATE */
 // [PATCH] /users/:id/:friendId : add or remove friend in friend's list
 const addRemoveFriend = async (req, res) => {
@@ -108,4 +122,4 @@ const updateUser = async (req, res) => {
   }
 };
 
-export { getUser, getUserFriends, addRemoveFriend, updateUser };
+export { getUser, getUserFriends, addRemoveFriend, updateUser, searchUser };
