@@ -17,6 +17,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import usersRoutes from "./routes/users.js";
 import postsRoutes from "./routes/posts.js";
+import commentsRoutes from "./routes/comment.js"
 
 // configurations
 // const __filename = fileURLToPath(import.meta.url);
@@ -37,6 +38,7 @@ app.use(cors());
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/posts", postsRoutes);
+app.use("/comments", commentsRoutes)
 
 // connect db & run server
 const PORT = process.env.PORT || 3001;
