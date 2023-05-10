@@ -18,15 +18,82 @@ const createPost = async (req, res) => {
       likes: {},
     });
     if (profileId) {
-      const posts = await Post.find({ user: profileId })
-        .sort({
-          createdAt: -1,
-        })
-        .populate("user");
+      const posts = await Post.aggregate([
+        {
+          $match: {
+            user: mongoose.Types.ObjectId(userId),
+          },
+        },
+        {
+          $lookup: {
+            from: "comments",
+            localField: "_id",
+            foreignField: "post",
+            as: "comments",
+          },
+        },
+        {
+          $lookup: {
+            from: "users", // collection to lookup
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $unwind: "$user",
+        },
+        {
+          $project: {
+            _id: 1,
+            user: "$user",
+            description: 1,
+            picturePath: 1,
+            filePath: 1,
+            fileName: 1,
+            likes: 1,
+            commentCount: { $size: "$comments" },
+            createdAt: 1,
+          },
+        },
+      ]).sort({ createdAt: -1 });
       res.status(201).json(posts);
     } else {
       // find all the post after create new post
-      const posts = await Post.find().sort({ createdAt: -1 }).populate("user");
+      const posts = await Post.aggregate([
+        {
+          $lookup: {
+            from: "comments",
+            localField: "_id",
+            foreignField: "post",
+            as: "comments",
+          },
+        },
+        {
+          $lookup: {
+            from: "users", // collection to lookup
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $unwind: "$user",
+        },
+        {
+          $project: {
+            _id: 1,
+            user: "$user",
+            description: 1,
+            picturePath: 1,
+            filePath: 1,
+            fileName: 1,
+            likes: 1,
+            commentCount: { $size: "$comments" },
+            createdAt: 1,
+          },
+        },
+      ]).sort({ createdAt: -1 });
       res.status(201).json(posts);
     }
   } catch (err) {
@@ -38,7 +105,6 @@ const createPost = async (req, res) => {
 // [GET] /posts : get feed posts
 const getFeedPosts = async (req, res) => {
   try {
-    // const posts = await Post.find().sort({ createdAt: -1 }).populate("user");
     const posts = await Post.aggregate([
       {
         $lookup: {
@@ -69,10 +135,10 @@ const getFeedPosts = async (req, res) => {
           fileName: 1,
           likes: 1,
           commentCount: { $size: "$comments" },
-          createdAt: 1
+          createdAt: 1,
         },
       },
-    ]);
+    ]).sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (err) {
     res.status(404).json(err.message);
@@ -119,11 +185,10 @@ const getUserPosts = async (req, res) => {
           fileName: 1,
           likes: 1,
           commentCount: { $size: "$comments" },
-          createdAt: 1
+          createdAt: 1,
         },
       },
-    ]);
-    // const postsReverse = posts.reverse();
+    ]).sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (err) {
     res.status(404).json(err.message);
@@ -153,8 +218,47 @@ const likePost = async (req, res) => {
       { likes: post.likes },
       // return ban moi thay vi ban goc
       { new: true }
-    ).populate("user");
-    res.status(200).json(updatedPost);
+    );
+    const newPost = await Post.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(id),
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "comments",
+        },
+      },
+      {
+        $lookup: {
+          from: "users", // collection to lookup
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 1,
+          user: "$user",
+          description: 1,
+          picturePath: 1,
+          filePath: 1,
+          fileName: 1,
+          likes: 1,
+          commentCount: { $size: "$comments" },
+          createdAt: 1,
+        },
+      },
+    ]);
+    res.status(200).json(newPost[0]);
   } catch (err) {
     res.status(404).json(err.message);
   }
@@ -180,8 +284,47 @@ const updatePost = async (req, res) => {
         picturePath: post.picturePath,
       },
       { new: true }
-    ).populate("user");
-    res.status(200).json(updatedPost);
+    );
+    const newPost = await Post.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(id),
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "comments",
+        },
+      },
+      {
+        $lookup: {
+          from: "users", // collection to lookup
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 1,
+          user: "$user",
+          description: 1,
+          picturePath: 1,
+          filePath: 1,
+          fileName: 1,
+          likes: 1,
+          commentCount: { $size: "$comments" },
+          createdAt: 1,
+        },
+      },
+    ]);
+    res.status(200).json(newPost[0]);
   } catch (error) {
     res.status(404).json(error.message);
   }

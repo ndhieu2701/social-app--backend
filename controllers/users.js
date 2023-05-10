@@ -38,9 +38,14 @@ const getUserFriends = async (req, res) => {
 const searchUser = async (req, res) => {
   try {
     const { q } = req.query;
-    const regex = new RegExp(q, "i");
+    // const regex = new RegExp(q, "i");
+    // const users = await User.find({
+    //   $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }],
+    // }).select("_id firstName lastName picturePath");
+    const keywords = q.trim().split(/\s+/).filter(word => word.length > 0);
+    const regexes = keywords.map((keyword) => new RegExp(keyword, "i"));
     const users = await User.find({
-      $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }],
+      $or: [{ firstName: { $in: regexes } }, { lastName: { $in: regexes } }],
     }).select("_id firstName lastName picturePath");
     res.status(200).json(users);
   } catch (error) {
