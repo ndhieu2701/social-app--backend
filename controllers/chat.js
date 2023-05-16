@@ -9,7 +9,8 @@ const getAllChat = async (req, res) => {
     var chats = await Chat.find({ users: id })
       .populate("users", "_id firstName lastName picturePath")
       .populate("latestMessage")
-      .populate("groupAdmin", "_id firstName lastName picturePath");
+      .populate("groupAdmin", "_id firstName lastName picturePath")
+      .sort({ updatedAt: -1 });
     chats = await User.populate(chats, {
       path: "latestMessage.sender",
       select: "firstName lastName picturePath",
